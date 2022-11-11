@@ -44,7 +44,7 @@ static NSString * const Log = @"Log";
 #pragma mark - 空白区域相关
 
 -(void)whiteSpaceClick{
-    NSLog(@"点击上部分空白区域");
+//    NSLog(@"点击上部分空白区域");
     if (self.block) {
         self.block(Close);
     }
@@ -52,10 +52,6 @@ static NSString * const Log = @"Log";
 }
 
 #pragma mark - webView高度，位置相关
-
-- (float)getWebViewHeight{
-    return self.webView.frame.size.height;
-}
 
 - (void)setWebViewHeight:(float)height{
     [self resetHeight:self.webView finalHeight:height];
@@ -238,7 +234,7 @@ static NSString * const Log = @"Log";
     NSData * jsonData = [NSJSONSerialization  dataWithJSONObject:dic options:0 error:&err];
     NSString * str = [[NSString alloc] initWithData:jsonData   encoding:NSUTF8StringEncoding];
     
-    NSLog(@"原生通知JS  openGame--%@", str);
+    //    NSLog(@"原生通知JS  openGame--%@", str);
     
     [self.webView evaluateJavaScript:Format(@"window.HttpTool?.NativeToJs('openGame', '%@')", str) completionHandler:^(id response, NSError *error) {
         
@@ -246,7 +242,7 @@ static NSString * const Log = @"Log";
             NSLog(@"原生通知JS  openGame--失败");
             
         } else {
-            NSLog(@"原生通知JS  openGame--成功");
+            //            NSLog(@"原生通知JS  openGame--成功");
         }
         
     }];
@@ -261,7 +257,7 @@ static NSString * const Log = @"Log";
                 NSLog(@"原生通知JS  resize--失败");
                 
             } else {
-                NSLog(@"原生通知JS  resize--成功");
+                //                NSLog(@"原生通知JS  resize--成功");
                 block(YES);
             }
             
@@ -276,7 +272,7 @@ static NSString * const Log = @"Log";
             NSLog(@"原生通知JS  ExitGame--失败");
             
         } else {
-            NSLog(@"原生通知JS  ExitGame--成功");
+//            NSLog(@"原生通知JS  ExitGame--成功");
         }
         
     }];

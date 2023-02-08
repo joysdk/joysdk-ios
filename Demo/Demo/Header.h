@@ -13,15 +13,8 @@
 //#import "LCPublicKit.h"
 //#import "LCPublicMethod.h"
 
-#define appid    @"1584099968"
-#define appStore @"https://apps.apple.com/us/app/id1584099968"
-
 #define K_Theme_Color               0xC63AE0
 #define K_Theme_Color2               0x23B4E0
-#define Terms         @"http://www.jiaoyibei.com/tl-use.html"
-#define PrivacyPolicy @"http://www.jiaoyibei.com/tl.html"
-#define appName       @"Laya"
-#define ReportWebAddress       @"https://kkyun.com/html/feedback_en.html"
 
 //状态栏和导航栏的总高度
 #define K_StatusNav_Height (SafeAreaTop + K_Nav_Height)

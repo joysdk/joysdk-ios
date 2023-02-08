@@ -91,8 +91,9 @@ static const NSInteger colorValue[] = {
 #ifdef __OBJC__
 #ifdef DEBUG
 //#define NSLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
-//#define NSLog(fmt, ...) NSLog((@"\n >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n " fmt), ##__VA_ARGS__)
-#define NSLog(fmt, ...) NSLog((@"\n\n" fmt), ##__VA_ARGS__)
+
+//#define NSLog(fmt, ...) NSLog((@"\n\nHuaLog:" fmt @"\n"), ##__VA_ARGS__)
+#define NSLog(...)
 
 #else
 #define NSLog(...)

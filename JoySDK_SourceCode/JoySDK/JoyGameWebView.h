@@ -22,7 +22,6 @@ typedef void(^ASGameWebViewBoolBlock)(BOOL isSuccess);
 
 -(void)loadUrl:(NSString *)url;
 
-- (float)getWebViewHeight;
 - (void)setWebViewHeight:(float)height;
 - (void)setWebViewHeightToBottom:(float)height;
 -(void)setWebViewOriginY;

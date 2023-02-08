@@ -8,7 +8,7 @@
 #import "JoyFloatBaseView.h"
 #import "Header.h"
 
-static CGFloat kMargin = 10.f;
+static CGFloat kMargin = 7.f;
 
 #define is_iPhoneXSerious @available(iOS 11.0, *) && UIApplication.sharedApplication.keyWindow.safeAreaInsets.bottom > 0.0
 

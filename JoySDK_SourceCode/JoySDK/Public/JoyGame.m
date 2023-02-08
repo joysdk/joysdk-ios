@@ -280,7 +280,6 @@ typedef void(^EventCodeBlock)(JoyGameEventCode eventCode);
     
     return Format(@"%@?mini=1&appKey=%@&pkgName=%@",
                   self.lobby,
-                  //                  @"http://172.16.0.52:7456",
                   self.appKey,
                   pkgName);
 }

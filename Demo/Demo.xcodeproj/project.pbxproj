@@ -15,6 +15,8 @@
 		1843547F28E6A079006CE934 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1843547D28E6A079006CE934 /* LaunchScreen.storyboard */; };
 		1843548228E6A079006CE934 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1843548128E6A079006CE934 /* main.m */; };
 		1843549028E6A0DD006CE934 /* JoySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1843548F28E6A0DD006CE934 /* JoySDK.framework */; };
+		18959B922993419A00A38EF4 /* LCCollectionWaterfallLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 18959B8F2993419A00A38EF4 /* LCCollectionWaterfallLayout.m */; };
+		18959B932993419A00A38EF4 /* ASGameCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 18959B912993419A00A38EF4 /* ASGameCollectionViewCell.m */; };
 		189E48A028F8FBDF00C8047C /* GameInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 189E489F28F8FBDF00C8047C /* GameInfo.m */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +35,10 @@
 		1843548128E6A079006CE934 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		1843548F28E6A0DD006CE934 /* JoySDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = JoySDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		184354A128E6CF08006CE934 /* Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
+		18959B8E2993419A00A38EF4 /* LCCollectionWaterfallLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCCollectionWaterfallLayout.h; sourceTree = "<group>"; };
+		18959B8F2993419A00A38EF4 /* LCCollectionWaterfallLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LCCollectionWaterfallLayout.m; sourceTree = "<group>"; };
+		18959B902993419A00A38EF4 /* ASGameCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASGameCollectionViewCell.h; sourceTree = "<group>"; };
+		18959B912993419A00A38EF4 /* ASGameCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASGameCollectionViewCell.m; sourceTree = "<group>"; };
 		189E489E28F8FBDF00C8047C /* GameInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameInfo.h; sourceTree = "<group>"; };
 		189E489F28F8FBDF00C8047C /* GameInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GameInfo.m; sourceTree = "<group>"; };
 		7A032A2F9FECDA53711FF6E8 /* Pods-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Demo.release.xcconfig"; path = "Target Support Files/Pods-Demo/Pods-Demo.release.xcconfig"; sourceTree = "<group>"; };
@@ -88,6 +94,10 @@
 				1843547328E6A076006CE934 /* SceneDelegate.m */,
 				1843547528E6A076006CE934 /* ViewController.h */,
 				1843547628E6A076006CE934 /* ViewController.m */,
+				18959B902993419A00A38EF4 /* ASGameCollectionViewCell.h */,
+				18959B912993419A00A38EF4 /* ASGameCollectionViewCell.m */,
+				18959B8E2993419A00A38EF4 /* LCCollectionWaterfallLayout.h */,
+				18959B8F2993419A00A38EF4 /* LCCollectionWaterfallLayout.m */,
 				1843547828E6A076006CE934 /* Main.storyboard */,
 				1843547B28E6A079006CE934 /* Assets.xcassets */,
 				1843547D28E6A079006CE934 /* LaunchScreen.storyboard */,
@@ -206,8 +216,10 @@
 				1843547728E6A076006CE934 /* ViewController.m in Sources */,
 				189E48A028F8FBDF00C8047C /* GameInfo.m in Sources */,
 				1843547128E6A076006CE934 /* AppDelegate.m in Sources */,
+				18959B922993419A00A38EF4 /* LCCollectionWaterfallLayout.m in Sources */,
 				1843548228E6A079006CE934 /* main.m in Sources */,
 				1843547428E6A076006CE934 /* SceneDelegate.m in Sources */,
+				18959B932993419A00A38EF4 /* ASGameCollectionViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

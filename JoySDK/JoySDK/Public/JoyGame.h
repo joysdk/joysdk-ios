@@ -47,9 +47,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)hideGameView;
 
 /*
+ 是否开启游戏悬浮球功能
+ */
+@property (nonatomic, assign) BOOL showFloatingButton;
+
+/*
  自定义悬浮球初始位置
  */
 - (void)setFloatingButtonFrame:(CGRect)frame;
+
+@property (nonatomic, assign) BOOL isDebug;
 
 @end
 

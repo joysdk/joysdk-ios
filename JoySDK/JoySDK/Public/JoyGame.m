@@ -14,6 +14,8 @@ static NSString *const HasOpenGameArrayKey = @"HasOpenGameArrayKey";
 
 typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
 
+typedef void(^EventCodeBlock)(JoyGameEventCode eventCode);
+
 @interface JoyGame()
 
 @property (strong, nonatomic) NSMutableArray *gameDataArray;
@@ -40,6 +42,8 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
 @property (nonatomic, copy) NSString *roomId;
 @property (nonatomic, copy) NSString *ext;
 @property (nonatomic, strong) UIViewController *rootViewController;
+
+@property (nonatomic, copy) EventCodeBlock eventCodeBlock;
 @end
 
 @interface JoyGameHoleInfoModel :NSObject
@@ -48,6 +52,8 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
 @property (nonatomic , assign) NSInteger gameId;
 @property (nonatomic , assign) NSInteger heightScale;
 @property (nonatomic , assign) NSInteger widthScale;
+@property (nonatomic , assign) BOOL isCPGame;
+@property (nonatomic , copy) NSString *gameUrl;
 @end
 
 @implementation JoyGame
@@ -106,11 +112,20 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
     self.hasOpenGameArray = [[NSMutableArray alloc] initWithArray:[NSUserDefaults.standardUserDefaults arrayForKey:HasOpenGameArrayKey]];
     
     //网络请求
-    NSString *urlString = @"https://joysdk.com/game/game/initSDK";
-    NSString *holeStr = Format(@"%@?appKey=%@", urlString, appKey);
-    NSURL *listURL = [NSURL URLWithString:holeStr];
+    NSString *urlString;
+    if (self.isDebug == YES) {
+        urlString = @"https://joysdk.com/game/game/initSDK";
+        
+    } else {
+        urlString = @"https://joysdk.com/game/game/initSDK";
+    }
+    
+    //拼接包名用于控制游戏列表的显示
+    NSString *pkgName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    NSString *holeStr = Format(@"%@?appKey=%@&pkgName=%@", urlString, appKey, pkgName);
+    
     NSURLSession * session= [NSURLSession sharedSession];
-    NSURLSessionDataTask * dataTask= [session dataTaskWithURL:listURL completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    NSURLSessionDataTask * dataTask= [session dataTaskWithURL:[NSURL URLWithString:holeStr] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
         self.gameDataArray = [NSMutableArray new];
         NSMutableArray *gameListArray = [NSMutableArray new];
@@ -163,6 +178,8 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
                     holeModel.gameId = [[dic objectForKey:@"gameId"] integerValue];
                     holeModel.heightScale = height;
                     holeModel.widthScale = width;
+                    holeModel.gameUrl = [dic objectForKey:@"gameUrl"];
+                    holeModel.isCPGame = [[dic objectForKey:@"isCPGame"] boolValue];
                     [self.gameDataArray addObject:holeModel];
                 }
                 
@@ -259,22 +276,39 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
 }
 
 -(NSString *)baseUrl{
-    return Format(@"%@?mini=1&appKey=%@",
+    NSString *pkgName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleIdentifier"];
+    
+    return Format(@"%@?mini=1&appKey=%@&pkgName=%@",
                   self.lobby,
-                  self.appKey);
+                  //                  @"http://172.16.0.52:7456",
+                  self.appKey,
+                  pkgName);
 }
 
 #pragma mark - 使用游戏列表
 
--(void)openGameWithGameId:(NSInteger)gameId token:(NSString *)token roomId:(nullable NSString * )roomId ext:(nullable NSString *)ext rootViewController:(UIViewController *)rootViewController eventCode:(void (^)(JoyGameEventCode eventCode))eventCodeBlock{
+-(void)openGameWithGameId:(NSInteger)gameId token:(NSString *)token roomId:(nullable NSString * )roomId ext:(nullable NSString *)ext rootViewController:(UIViewController *)rootViewController eventCode:(EventCodeBlock)eventCodeBlock{
+    
+    [self openGameWithGameId:gameId token:token roomId:roomId ext:ext rootViewController:rootViewController eventCode:^(JoyGameEventCode eventCode) {
+        
+        eventCodeBlock(eventCode);
+        
+    } isFloatViewClick:NO];
+}
+
+-(void)openGameWithGameId:(NSInteger)gameId token:(NSString *)token roomId:(nullable NSString * )roomId ext:(nullable NSString *)ext rootViewController:(UIViewController *)rootViewController eventCode:(EventCodeBlock)eventCodeBlock isFloatViewClick:(BOOL)isFloatViewClick{
     self.isShowGameAble = YES;
     self.floatView.hidden = YES;
     
+    //存起来是为了在点击悬浮球按钮时，调用openGameWithGameId
     self.gameId = gameId;
     self.token = token;
     self.roomId = roomId;
     self.ext = ext;
     self.rootViewController = rootViewController;
+    if (!isFloatViewClick) {
+        self.eventCodeBlock = eventCodeBlock;
+    }
     [self floatGameViewBuild];
     
     if (rootViewController == nil){
@@ -289,8 +323,10 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
     
     [self checkWebviewExists:^(BOOL isSuccess) {
         
+        JoyGameHoleInfoModel *currentJoyGameHoleInfoModel;
         for (JoyGameHoleInfoModel *joyGameHoleInfoModel in self.gameDataArray) {
             if (joyGameHoleInfoModel.gameId == gameId) {
+                currentJoyGameHoleInfoModel = joyGameHoleInfoModel;
                 
                 //                NSLog(@"改变webview尺寸");
                 [self.gameWebView setWebViewHeightToBottom: K_Width *joyGameHoleInfoModel.heightScale /joyGameHoleInfoModel.widthScale];
@@ -314,7 +350,7 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
         }
         
         //之前缓存过的游戏，直接通知js刷新
-        if ([self.hasOpenGameArray containsObject:@(gameId)] && self.isHallHasPreloaded) {
+        if ([self.hasOpenGameArray containsObject:@(gameId)] && self.isHallHasPreloaded && currentJoyGameHoleInfoModel.isCPGame == 0) {
             self.isHasLoadingview = NO;
             
             [self.gameWebView openGame:gameId token:token roomId:roomId ext:ext];
@@ -326,12 +362,19 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
             self.isHasLoadingview = YES;
             
             NSLog(@"没有缓存过的游戏 或者大厅预加载没完成，直接load");
-            NSString *holeGameUrl = Format(@"%@&gameId=%ld&token=%@&roomId=%@&ext=%@",
-                                           [self baseUrl],
-                                           (long)gameId,
-                                           token,
-                                           roomId,
-                                           ext);
+            
+            NSString *holeGameUrl;
+            if (currentJoyGameHoleInfoModel.isCPGame == 0) {
+                holeGameUrl = Format(@"%@&gameId=%ld&token=%@&roomId=%@&ext=%@",
+                                     [self baseUrl],
+                                     (long)gameId,
+                                     token,
+                                     roomId,
+                                     ext);
+                
+            } else {
+                holeGameUrl = currentJoyGameHoleInfoModel.gameUrl;
+            }
             
             [self.gameWebView loadUrl:holeGameUrl];
             
@@ -352,12 +395,12 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
                 if (self.isShowGameAble) {
                     self.isShowGameAble = NO;
                     
-                    eventCodeBlock(block);
+                    self.eventCodeBlock(block);
                     [self hideGameView];
                 }
                 
             }else{
-                eventCodeBlock(block);
+                self.eventCodeBlock(block);
             }
         };
         
@@ -371,11 +414,12 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
     self.isShowGameAble = YES;
     self.floatView.hidden = YES;
     
+    //存起来是为了在点击悬浮球按钮时，调用openGameWithGameId
     self.token = token;
     self.roomId = roomId;
     self.ext = ext;
     self.rootViewController = rootViewController;
-    
+    self.eventCodeBlock = eventCodeBlock;
     if (rootViewController == nil){
         NSLog(@"根控制器为空");
         return;
@@ -436,12 +480,12 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
                 if (self.isShowGameAble) {
                     self.isShowGameAble = NO;
                     
-                    eventCodeBlock(block);
+                    self.eventCodeBlock(block);
                     [self hideGameView];
                 }
                 
             }else{
-                eventCodeBlock(block);
+                self.eventCodeBlock(block);
             }
         };
         
@@ -452,11 +496,19 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
 #pragma mark - 悬浮按钮
 
 - (void)setFloatingButtonFrame:(CGRect)frame{
+    if (!self.showFloatingButton) {
+        return;
+    }
+    
     self.floatViewFrame = frame;
     [self floatViewFrameSet];
 }
 
 - (void)floatGameViewBuild{
+    if (!self.showFloatingButton) {
+        return;
+    }
+    
     if (!self.floatView) {
         
         //悬浮父view
@@ -464,10 +516,9 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
         
         //悬浮按钮点击，打开游戏
         floatView.floatViewDidClickBlock = ^(JoyFloatBaseView * _Nonnull floatView) {
-            
             [self openGameWithGameId:self.gameId token:self.token roomId:self.roomId ext:self.ext rootViewController:self.rootViewController eventCode:^(JoyGameEventCode eventCode) {
                 
-            }];
+            } isFloatViewClick:YES];
             
         };
         
@@ -514,6 +565,10 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
     for (JoyGameHoleInfoModel *joyGameHoleInfoModel in self.gameDataArray) {
         if (joyGameHoleInfoModel.gameId == self.gameId) {
             
+            if ([joyGameHoleInfoModel.iconUrl isKindOfClass:[NSNull class]]) {
+                return;
+            }
+            
             //dataWithContentsOfURL卡顿，在子线程解决
             dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
             dispatch_async(queue, ^{
@@ -533,7 +588,7 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
 
 //设置悬浮球坐标
 - (void)floatViewFrameSet{
-    self.floatView.frame = !CGRectEqualToRect(self.floatViewFrame, CGRectZero) ?self.floatViewFrame :CGRectMake(K_Width -60 -10, SCREEN_HEIGHT *2/3, 60, 60);
+    self.floatView.frame = !CGRectEqualToRect(self.floatViewFrame, CGRectZero) ?self.floatViewFrame :CGRectMake(K_Width -60 -7, SCREEN_HEIGHT *2/3, 60, 60);
     self.floatGameImageView.frame = CGRectMake(0, 5, GetWidth(self.floatView) -5, GetHeight(self.floatView) -5);
     radiusCorner(self.floatGameImageView, 7);
     
@@ -562,9 +617,12 @@ typedef void(^JoyGameBoolBlock)(BOOL isSuccess);
     //    NSLog(@"隐藏webview");
     self.gameWebView.hidden = YES;
     
-    [self.floatView removeFromSuperview];
-    [self.rootViewController.view addSubview:self.floatView];
-    self.floatView.hidden = NO;
+    if (self.showFloatingButton){
+        [self.floatView removeFromSuperview];
+        [self.rootViewController.view addSubview:self.floatView];
+        self.floatView.hidden = NO;
+    }
+    
 }
 
 - (UIColor*)colorWithHexValue:(NSInteger)aHexValue
